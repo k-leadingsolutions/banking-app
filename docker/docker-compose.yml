@@ -1,0 +1,15 @@
+version: '2'
+services:
+  banking-account-app-server:
+    container_name: banking-account-app-server
+    build:
+      context: docker-banking-account-app-server
+      dockerfile: Dockerfile
+    image: banking-account-app-server:latest
+    ports:
+      - 18888:8888
+    networks:
+      - spring-cloud-network
+networks:
+  spring-cloud-network:
+    driver: bridge

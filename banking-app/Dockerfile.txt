@@ -1,0 +1,20 @@
+# build stage
+FROM maven:3.6.3-openjdk-17 as target
+WORKDIR /build
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+COPY src/ /build/src/
+RUN mvn package
+
+FROM openjdk:17
+
+ARG AWS_SKEY=""
+ARG AWS_AKEY=""
+ENV AWS_SKEY="${AWS_SKEY}"
+ENV AWS_AKEY="${AWS_AKEY}"
+
+FROM openjdk:17-jdk-alpine
+MAINTAINER banking.com
+COPY target/docker-banking-account-app-server-1.0.0.jar banking-account-app-server-1.0.0.jar
+ENTRYPOINT ["java","-jar","/banking-account-app-server-1.0.0.jar"]
