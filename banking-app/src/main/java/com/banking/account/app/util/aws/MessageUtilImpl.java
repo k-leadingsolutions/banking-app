@@ -14,7 +14,7 @@ import software.amazon.awssdk.regions.Region;
 
 @Slf4j
 @Component
-public class SnsClientUtilImpl implements SnsClientUtil {
+public class MessageUtilImpl implements MessageUtil {
 
     @Value("$aws.sns.region")
     private String awsRegion;

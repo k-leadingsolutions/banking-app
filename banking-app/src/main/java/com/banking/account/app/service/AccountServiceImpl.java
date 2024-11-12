@@ -4,9 +4,10 @@ import com.banking.account.app.dto.WithdrawalEvent;
 import com.banking.account.app.entity.Account;
 import com.banking.account.app.repository.AccountRepository;
 import com.banking.account.app.util.ServiceException;
-import com.banking.account.app.util.aws.SnsClientUtil;
+import com.banking.account.app.util.aws.MessageUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,16 @@ import java.util.Objects;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-    private final SnsClientUtil snsClientUtil;
+    private final MessageUtil messageUtil;
 
     private final AccountRepository accountRepository;
 
-    public AccountServiceImpl(SnsClientUtil snsClientUtil, AccountRepository accountRepository) {
-        this.snsClientUtil = snsClientUtil;
+    public AccountServiceImpl(MessageUtil messageUtil, AccountRepository accountRepository) {
+        this.messageUtil = messageUtil;
         this.accountRepository = accountRepository;
     }
 
+    @Transactional
     @Override
     public String withdraw(Long accountId, BigDecimal amount) {
         // add null-check using apache for multiple objects
@@ -42,6 +44,7 @@ public class AccountServiceImpl implements AccountService {
         return processWithdrawal(amount, account);
 
     }
+
 
     private String processWithdrawal(BigDecimal amount, Account account) {
         BigDecimal currentBalance = account.getAmount();
@@ -69,7 +72,7 @@ public class AccountServiceImpl implements AccountService {
 
             //log message
             log.info("publishing message {}", message);
-            this.snsClientUtil.publish(message);
+            this.messageUtil.publish(message);
             return "Withdrawal Successful";
         } catch (JsonProcessingException e) {
             return "Failed to publish message: " + e.getMessage();
