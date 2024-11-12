@@ -17,6 +17,7 @@ import java.util.Objects;
 
 @Slf4j
 @Service
+@Transactional
 public class AccountServiceImpl implements AccountService {
 
     private final MessageUtil messageUtil;
@@ -28,7 +29,6 @@ public class AccountServiceImpl implements AccountService {
         this.accountRepository = accountRepository;
     }
 
-    @Transactional
     @Override
     public String withdraw(Long accountId, BigDecimal amount) {
         // add null-check using apache for multiple objects
